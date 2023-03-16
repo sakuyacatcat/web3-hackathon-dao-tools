@@ -102,3 +102,7 @@ dist
 
 # TernJS port file
 .tern-port
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
