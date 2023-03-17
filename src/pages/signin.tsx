@@ -8,50 +8,41 @@ import {
   FormLabel,
   Grid,
   Heading,
-  Input,
-  Spacer,
-  useToast,
+  Input, Link, Spacer,
+  useToast
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  sendEmailVerification,
-} from 'firebase/auth'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { useRouter } from 'next/router'
 import { FormEvent, useState } from 'react'
 
-export const SignUp = () => {
+export const SignIn = () => {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const toast = useToast()
+  const { push } = useRouter()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     setIsLoading(true)
     e.preventDefault()
-
     try {
       const auth = getAuth()
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      )
-      await sendEmailVerification(userCredential.user)
+      await signInWithEmailAndPassword(auth, email, password)
       setEmail('')
       setPassword('')
       toast({
-        title: '確認メールを送信しました。',
+        title: 'ログインしました。',
         status: 'success',
         position: 'top',
       })
+      push('/')
     } catch (e) {
       toast({
         title: 'エラーが発生しました。',
         status: 'error',
         position: 'top',
       })
-
       if (e instanceof FirebaseError) {
         console.log(e)
       }
@@ -62,7 +53,7 @@ export const SignUp = () => {
 
   return (
     <Container py={14}>
-      <Heading>サインアップ</Heading>
+      <Heading>サインイン</Heading>
       <chakra.form onSubmit={handleSubmit}>
         <Spacer height={8} aria-hidden />
         <Grid gap={4}>
@@ -94,7 +85,14 @@ export const SignUp = () => {
         <Spacer height={4} aria-hidden />
         <Center>
           <Button type={'submit'} isLoading={isLoading}>
-            アカウントを作成
+            ログイン
+          </Button>
+        </Center>
+        <Center>
+          <Button variant="link" mt={8}>
+            <Link href="/signup">
+              新規登録画面へ
+            </Link>
           </Button>
         </Center>
       </chakra.form>
@@ -102,4 +100,4 @@ export const SignUp = () => {
   )
 }
 
-export default SignUp
+export default SignIn

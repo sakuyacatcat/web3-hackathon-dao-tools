@@ -1,4 +1,12 @@
-import { Button, chakra, Container, Heading, useToast } from '@chakra-ui/react'
+import {
+  Button,
+  chakra,
+  Container,
+  Flex,
+  Heading,
+  Link,
+  useToast,
+} from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
 import { useAuthContext } from '@src/lib/auth/AuthProvider'
 import { getAuth, signOut } from 'firebase/auth'
@@ -34,19 +42,30 @@ export const Header = () => {
   return (
     <chakra.header py={4} bgColor={'blue.600'}>
       <Container maxW={'container.lg'}>
-        <Heading color={'white'}>
+        <Flex justifyContent="space-between" alignItems="center">
+          <Heading color={'white'}>
+            <Link
+              href="/"
+              fontWeight="bold"
+              textDecoration="none"
+              _hover={{ textDecoration: 'none' }}
+            >
+              CREATION GATE!
+            </Link>
+          </Heading>
           {user ? (
             <Button
               colorScheme={'teal'}
               onClick={handleSignOut}
               isLoading={isLoading}
+              ml={4}
             >
               サインアウト
             </Button>
           ) : (
-            'ログアウト中'
+            ''
           )}
-        </Heading>
+        </Flex>
       </Container>
     </chakra.header>
   )
