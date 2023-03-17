@@ -21,7 +21,6 @@ import { FormEvent, useState } from 'react'
 export const NewIdea = () => {
   const { user } = useAuthContext()
   const [headline, setHeadline] = useState('')
-  const [subHeadline, setSubHeadline] = useState('')
   const [summary, setSummary] = useState('')
   const [issue, setIssue] = useState('')
   const [solution, setSolution] = useState('')
@@ -39,7 +38,6 @@ export const NewIdea = () => {
       const db = getFirestore()
       await addDoc(collection(db, 'ideas'), {
         headline,
-        subHeadline,
         summary,
         issue,
         solution,
@@ -50,7 +48,6 @@ export const NewIdea = () => {
         timestamp: serverTimestamp(),
       })
       setHeadline('')
-      setSubHeadline('')
       setSummary('')
       setIssue('')
       setSolution('')

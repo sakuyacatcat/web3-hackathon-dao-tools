@@ -12,14 +12,14 @@ import {
   Link,
   Select,
   Spacer,
-  useToast
+  useToast,
 } from '@chakra-ui/react'
 import { doc, getFirestore, setDoc } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
 import {
   createUserWithEmailAndPassword,
   getAuth,
-  sendEmailVerification
+  sendEmailVerification,
 } from 'firebase/auth'
 import { FormEvent, useState } from 'react'
 
