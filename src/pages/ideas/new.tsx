@@ -1,13 +1,14 @@
-import { Box, Button, Container, Input, Stack } from '@chakra-ui/react'
+import { Box, Button, Container, Input, Stack, useToast } from '@chakra-ui/react'
 import {
   addDoc,
   collection,
   getFirestore,
-  serverTimestamp,
+  serverTimestamp
 } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'
 import { useAuthContext } from '@src/lib/auth/AuthProvider'
+import { useRouter } from 'next/router'
 import { FormEvent, useState } from 'react'
 
 export const NewIdea = () => {
@@ -20,8 +21,12 @@ export const NewIdea = () => {
   const [creatorVoice, setCreatorVoice] = useState('')
   const [howToStart, setHowToStart] = useState('')
   const [customerVoice, setCustomerVoice] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const toast = useToast()
+  const { push } = useRouter()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    setIsLoading(true)
     e.preventDefault()
     try {
       const db = getFirestore()
@@ -45,10 +50,17 @@ export const NewIdea = () => {
       setCreatorVoice('')
       setHowToStart('')
       setCustomerVoice('')
+      toast({
+        title: 'アイデア投稿しました',
+      status: 'success',
+    position: 'top', })
+      push('/')
     } catch (e) {
       if (e instanceof FirebaseError) {
         console.log(e)
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -104,7 +116,7 @@ export const NewIdea = () => {
                 value={customerVoice}
                 onChange={(e) => setCustomerVoice(e.target.value)}
               />
-              <Button colorScheme="teal" size="lg" type="submit">
+              <Button colorScheme="teal" size="lg" type="submit" isLoading={isLoading}>
                 投稿
               </Button>
             </Stack>

@@ -5,7 +5,7 @@ import {
   GridItem,
   Heading,
   Text,
-  VStack,
+  VStack
 } from '@chakra-ui/react'
 import { AuthGuard } from '@src/components/AuthGuard'
 import { collection, getDocs, getFirestore } from 'firebase/firestore'
@@ -14,9 +14,16 @@ import { useEffect, useState } from 'react'
 
 interface Idea {
   id: string
-  idea: string
+  headline: string
+  subHeadline: string
+  summary: string
+  issue: string
+  solution: string
+  creatorVoice: string
+  howToStart: string
+  customerVoice: string
   author: string
-  createdAt: string
+  timestamp: string
 }
 
 export default function Home() {
@@ -70,10 +77,10 @@ export default function Home() {
                     bg="white"
                   >
                     <VStack spacing={4} alignItems="start">
-                      <Heading size="md">{idea.idea}</Heading>
-                      <Text>{idea.idea}</Text>
+                      <Heading size="md">{idea.headline}</Heading>
+                      <Text>{idea.summary}</Text>
                       <Text fontSize="sm" color="gray.500">
-                        投稿者: {idea.author}
+                        by {idea.author}
                       </Text>
                     </VStack>
                   </Center>
