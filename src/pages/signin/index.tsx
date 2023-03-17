@@ -1,16 +1,16 @@
 import {
-    Box,
-    Button,
-    Center,
-    chakra,
-    Container,
-    FormControl,
-    FormLabel,
-    Grid,
-    Heading,
-    Input,
-    Spacer,
-    useToast
+  Box,
+  Button,
+  Center,
+  chakra,
+  Container,
+  FormControl,
+  FormLabel,
+  Grid,
+  Heading,
+  Input,
+  Spacer,
+  useToast,
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
