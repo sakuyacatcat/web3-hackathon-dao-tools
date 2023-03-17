@@ -10,20 +10,23 @@ import {
   Heading,
   Input,
   Link,
+  Select,
   Spacer,
-  useToast,
+  useToast
 } from '@chakra-ui/react'
+import { doc, getFirestore, setDoc } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
 import {
   createUserWithEmailAndPassword,
   getAuth,
-  sendEmailVerification,
+  sendEmailVerification
 } from 'firebase/auth'
 import { FormEvent, useState } from 'react'
 
 export const SignUp = () => {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const [role, setRole] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const toast = useToast()
 
@@ -32,15 +35,24 @@ export const SignUp = () => {
     e.preventDefault()
 
     try {
+      const db = getFirestore()
       const auth = getAuth()
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       )
+
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        email: userCredential.user.email,
+        role: role,
+      })
+
       await sendEmailVerification(userCredential.user)
       setEmail('')
       setPassword('')
+      setRole('')
+
       toast({
         title: '確認メールを送信しました。',
         status: 'success',
@@ -89,6 +101,14 @@ export const SignUp = () => {
                   setPassword(e.target.value)
                 }}
               />
+            </FormControl>
+            <FormControl>
+              <FormLabel>ロール</FormLabel>
+              <Select value={role} onChange={(e) => setRole(e.target.value)}>
+                <option value="engineer">技術職</option>
+                <option value="business">事務職</option>
+                <option value="administrator">BE creation</option>
+              </Select>
             </FormControl>
           </Box>
         </Grid>

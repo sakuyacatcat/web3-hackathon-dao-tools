@@ -1,9 +1,16 @@
-import { Box, Button, Container, Input, Stack, useToast } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Container,
+  Input,
+  Stack,
+  useToast,
+} from '@chakra-ui/react'
 import {
   addDoc,
   collection,
   getFirestore,
-  serverTimestamp
+  serverTimestamp,
 } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'
@@ -52,8 +59,9 @@ export const NewIdea = () => {
       setCustomerVoice('')
       toast({
         title: 'アイデア投稿しました',
-      status: 'success',
-    position: 'top', })
+        status: 'success',
+        position: 'top',
+      })
       push('/')
     } catch (e) {
       if (e instanceof FirebaseError) {
@@ -116,7 +124,12 @@ export const NewIdea = () => {
                 value={customerVoice}
                 onChange={(e) => setCustomerVoice(e.target.value)}
               />
-              <Button colorScheme="teal" size="lg" type="submit" isLoading={isLoading}>
+              <Button
+                colorScheme="teal"
+                size="lg"
+                type="submit"
+                isLoading={isLoading}
+              >
                 投稿
               </Button>
             </Stack>
