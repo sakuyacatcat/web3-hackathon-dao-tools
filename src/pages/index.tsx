@@ -40,13 +40,23 @@ export default function Home() {
     <AuthGuard>
       <Center>
         <VStack spacing={8}>
-          <Heading size="lg" mb={4}>
-            <Button colorScheme="teal" variant="outline" size="lg" mt={8}>
-              <Link href="/ideas/new">
-                自分のアイデアをプレスリリースで投稿する
-              </Link>
-            </Button>
-          </Heading>
+          <Center mt={8}>
+            <Heading size="2xl">The road to BE creation</Heading>
+          </Center>
+          <Center>
+            <Text textAlign="center">
+              CREATION GATE はアイデアを匿名で投稿できるSNSです
+              <br />
+              支持の厚いアイデアは BE creation の投資オファーを受けることも
+              <br />
+              投稿されたアイデアをディスカッションを通してカイゼンしましょう
+            </Text>
+          </Center>
+          <Button colorScheme="teal" variant="outline" size="lg" mt={4}>
+            <Link href="/ideas/new">
+              自分のアイデアをプレスリリースで投稿する
+            </Link>
+          </Button>
           <Grid templateColumns="repeat(2, 1fr)" gap={8}>
             {ideas.map((idea) => (
               <GridItem key={idea.id} colSpan={1}>

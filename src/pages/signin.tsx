@@ -8,8 +8,10 @@ import {
   FormLabel,
   Grid,
   Heading,
-  Input, Link, Spacer,
-  useToast
+  Input,
+  Link,
+  Spacer,
+  useToast,
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
@@ -90,9 +92,7 @@ export const SignIn = () => {
         </Center>
         <Center>
           <Button variant="link" mt={8}>
-            <Link href="/signup">
-              新規登録画面へ
-            </Link>
+            <Link href="/signup">新規登録画面へ</Link>
           </Button>
         </Center>
       </chakra.form>

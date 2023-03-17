@@ -1,13 +1,4 @@
-import {
-  Box,
-  Button,
-  Center,
-  Container,
-  Heading,
-  Input,
-  Stack,
-  Text,
-} from '@chakra-ui/react'
+import { Box, Button, Container, Input, Stack } from '@chakra-ui/react'
 import {
   addDoc,
   collection,
@@ -19,20 +10,41 @@ import { AuthGuard } from '@src/components/AuthGuard'
 import { useAuthContext } from '@src/lib/auth/AuthProvider'
 import { FormEvent, useState } from 'react'
 
-export const Idea = () => {
+export const NewIdea = () => {
   const { user } = useAuthContext()
-  const [idea, setIdea] = useState('')
+  const [headline, setHeadline] = useState('')
+  const [subHeadline, setSubHeadline] = useState('')
+  const [summary, setSummary] = useState('')
+  const [issue, setIssue] = useState('')
+  const [solution, setSolution] = useState('')
+  const [creatorVoice, setCreatorVoice] = useState('')
+  const [howToStart, setHowToStart] = useState('')
+  const [customerVoice, setCustomerVoice] = useState('')
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
       const db = getFirestore()
       await addDoc(collection(db, 'ideas'), {
-        idea,
+        headline,
+        subHeadline,
+        summary,
+        issue,
+        solution,
+        creatorVoice,
+        howToStart,
+        customerVoice,
         author: user?.email,
-        createdAt: serverTimestamp(),
+        timestamp: serverTimestamp(),
       })
-      setIdea('')
+      setHeadline('')
+      setSubHeadline('')
+      setSummary('')
+      setIssue('')
+      setSolution('')
+      setCreatorVoice('')
+      setHowToStart('')
+      setCustomerVoice('')
     } catch (e) {
       if (e instanceof FirebaseError) {
         console.log(e)
@@ -43,32 +55,64 @@ export const Idea = () => {
   return (
     <AuthGuard>
       <Container maxW="xl" py={12}>
-        <Center mb={8}>
-          <Heading size="2xl">アイデアをシェアしよう！</Heading>
-        </Center>
         <Box boxShadow="lg" p={6} rounded="lg">
           <form onSubmit={handleSubmit}>
-            <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
+            <Stack direction={{ base: 'column', md: 'column' }} spacing={4}>
               <Input
-                placeholder="アイデアを入力"
+                placeholder="見出し(必須)"
                 size="lg"
-                value={idea}
-                onChange={(e) => setIdea(e.target.value)}
+                value={headline}
+                onChange={(e) => setHeadline(e.target.value)}
+                required
+                aria-required
+              />
+              <Input
+                placeholder="概要(必須)"
+                size="lg"
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                required
+                aria-required
+              />
+              <Input
+                placeholder="課題"
+                size="lg"
+                value={issue}
+                onChange={(e) => setIssue(e.target.value)}
+              />
+              <Input
+                placeholder="解決策"
+                size="lg"
+                value={solution}
+                onChange={(e) => setSolution(e.target.value)}
+              />
+              <Input
+                placeholder="発案者の声"
+                size="lg"
+                value={creatorVoice}
+                onChange={(e) => setCreatorVoice(e.target.value)}
+              />
+              <Input
+                placeholder="始め方"
+                size="lg"
+                value={howToStart}
+                onChange={(e) => setHowToStart(e.target.value)}
+              />
+              <Input
+                placeholder="顧客の声"
+                size="lg"
+                value={customerVoice}
+                onChange={(e) => setCustomerVoice(e.target.value)}
               />
               <Button colorScheme="teal" size="lg" type="submit">
                 投稿
               </Button>
             </Stack>
           </form>
-          <Text mt={4} textAlign="center">
-            「アイデアをシェアしよう！」はアイデアを投稿するSNSです。
-            <br />
-            登録不要で、誰でもアイデアを閲覧・投稿することができます。
-          </Text>
         </Box>
       </Container>
     </AuthGuard>
   )
 }
 
-export default Idea
+export default NewIdea
