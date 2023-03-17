@@ -1,6 +1,6 @@
 import { Button, chakra, Container, Heading, useToast } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
-import { useAuthContext } from '@src/lib/auth/authProvider'
+import { useAuthContext } from '@src/lib/auth/AuthProvider'
 import { getAuth, signOut } from 'firebase/auth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'

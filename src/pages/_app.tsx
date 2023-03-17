@@ -1,7 +1,7 @@
 import { ChakraProvider } from '@chakra-ui/react'
-import { Header } from '@src/components/header'
+import { Header } from '@src/components/Header'
 import { initializeFirebaseApp } from '@src/configs/initFirebase'
-import { AuthProvider } from '@src/lib/auth/authProvider'
+import { AuthProvider } from '@src/lib/auth/AuthProvider'
 import { getApp } from 'firebase/app'
 import type { AppProps } from 'next/app'
 
