@@ -1,55 +1,57 @@
-import {
-  Box,
-  Button,
-  Center,
-  Container,
-  Heading,
-  Input,
-  Stack,
-  Text,
-} from '@chakra-ui/react'
-import { AuthGuard } from '@src/components/AuthGuard'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { Center, Grid, GridItem, Heading, Text, VStack } from '@chakra-ui/react'
+import { getDatabase, onChildAdded, ref } from '@firebase/database'
+import { FirebaseError } from '@firebase/util'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
-  const router = useRouter()
-  const [idea, setIdea] = useState('')
+  const [ideas, setIdeas] = useState<{ idea: string }[]>([])
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (idea.trim()) {
-      router.push(`/ideas?search=${idea.trim()}`)
+  useEffect(() => {
+    try {
+      const db = getDatabase()
+      const dbRef = ref(db, 'idea')
+      return onChildAdded(dbRef, (snapshot) => {
+        const idea = String(snapshot.val()['idea'] ?? '')
+        setIdeas((prev) => [...prev, { idea }])
+      })
+    } catch (e) {
+      if (e instanceof FirebaseError) {
+        console.error(e)
+      }
+      return
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
-    <AuthGuard>
-      <Container maxW="xl" py={12}>
-        <Center mb={8}>
-          <Heading size="2xl">アイデアをシェアしよう！</Heading>
-        </Center>
-        <Box boxShadow="lg" p={6} rounded="lg">
-          <form onSubmit={handleSubmit}>
-            <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
-              <Input
-                placeholder="アイデアを入力"
-                size="lg"
-                value={idea}
-                onChange={(e) => setIdea(e.target.value)}
-              />
-              <Button colorScheme="teal" size="lg" type="submit">
-                検索
-              </Button>
-            </Stack>
-          </form>
-          <Text mt={4} textAlign="center">
-            「アイデアをシェアしよう！」はアイデアを投稿するSNSです。
-            <br />
-            登録不要で、誰でもアイデアを閲覧・投稿することができます。
-          </Text>
-        </Box>
-      </Container>
-    </AuthGuard>
+    <Center>
+      <VStack spacing={8}>
+        <Heading size="lg" mb={4}>
+          事業アイデア一覧
+        </Heading>
+        <Grid templateColumns="repeat(2, 1fr)" gap={8}>
+          {ideas.map((idea) => (
+            <GridItem key={idea.idea} colSpan={1}>
+              <Center
+                h="200px"
+                w="100%"
+                rounded="md"
+                boxShadow="md"
+                p={4}
+                bg="white"
+              >
+                <VStack spacing={4} alignItems="start">
+                  <Heading size="md">{idea.idea}</Heading>
+                  <Text>{idea.idea}</Text>
+                  <Text fontSize="sm" color="gray.500">
+                    投稿者: {idea.idea}
+                  </Text>
+                </VStack>
+              </Center>
+            </GridItem>
+          ))}
+        </Grid>
+      </VStack>
+    </Center>
   )
 }

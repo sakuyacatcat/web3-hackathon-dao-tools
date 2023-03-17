@@ -1,12 +1,12 @@
 import {
-    Box,
-    Button,
-    Center,
-    Container,
-    Heading,
-    Input,
-    Stack,
-    Text
+  Box,
+  Button,
+  Center,
+  Container,
+  Heading,
+  Input,
+  Stack,
+  Text,
 } from '@chakra-ui/react'
 import { getDatabase, push, ref } from '@firebase/database'
 import { FirebaseError } from '@firebase/util'
@@ -30,7 +30,8 @@ export const Idea = () => {
       if (e instanceof FirebaseError) {
         console.log(e)
       }
-    }  }
+    }
+  }
 
   return (
     <Container maxW="xl" py={12}>
