@@ -5,9 +5,10 @@ import {
   Container,
   Flex,
   Heading,
+  IconButton,
   Input,
   Spacer,
-  Text,
+  Text
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'
@@ -17,10 +18,11 @@ import {
   doc,
   getFirestore,
   onSnapshot,
-  updateDoc,
+  updateDoc
 } from 'firebase/firestore'
 import { useRouter } from 'next/router'
 import { FormEvent, useEffect, useState } from 'react'
+import { FaHeart } from 'react-icons/fa'
 
 interface Idea {
   id: string
@@ -33,6 +35,7 @@ interface Idea {
   customerVoice: string
   author: string
   timestamp: string
+  likes: number
 }
 
 interface Reply {
@@ -65,6 +68,7 @@ const IdeaDetail = () => {
   const [idea, setIdea] = useState<Idea>()
   const [replies, setReplies] = useState<Reply[]>([])
   const [message, setMessage] = useState<string>('')
+  const [likes, setLikes] = useState<number>(0)
   const db = getFirestore()
 
   useEffect(() => {
@@ -72,14 +76,18 @@ const IdeaDetail = () => {
       const ideaRef = doc(db, 'ideas', id)
       const unsubscribe = onSnapshot(ideaRef, (ideaSnapshot) => {
         setIdea(ideaSnapshot.data() as Idea)
+        setLikes(ideaSnapshot.data().likes.length)
 
         const repliesSnapshot = ideaSnapshot.data().replies
-        const replyList = repliesSnapshot.map((reply, id) => ({
-          id: id,
-          message: reply.message,
-          author: reply.author,
-        }))
-        setReplies(replyList)
+
+        if (repliesSnapshot) {
+          const replyList = repliesSnapshot.map((reply, id) => ({
+            id: id,
+            message: reply.message,
+            author: reply.author,
+          }))
+          setReplies(replyList)
+        }
       })
     }
 
@@ -104,6 +112,20 @@ const IdeaDetail = () => {
       }
     }
   }
+
+  const handleLike = async () => {
+    try {
+      await updateDoc(doc(db, 'ideas', id), {
+        likes: likes + 1,
+      })
+      setLikes(likes + 1)
+    } catch (e) {
+      if (e instanceof FirebaseError) {
+        console.log(e)
+      }
+    }
+  }
+
   if (!idea) {
     return <div>Loading...</div>
   }
@@ -113,6 +135,16 @@ const IdeaDetail = () => {
       <Container maxW="xl" py={12}>
         <Box boxShadow="lg" p={6} rounded="lg">
           <Heading size="md">{idea.headline}</Heading>
+          <IconButton
+            aria-label="いいね！"
+            size="md"
+            icon={<FaHeart />}
+            onClick={handleLike}
+            mt={2}
+            isRound
+            colorScheme="red"
+          />
+          {likes}
           <Heading size="xs" mt={3}>
             サマリー
           </Heading>
