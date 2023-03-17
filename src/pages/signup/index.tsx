@@ -9,17 +9,55 @@ import {
   Grid,
   Heading,
   Input,
-  Spacer
-} from '@chakra-ui/react';
-import { FormEvent, useState } from 'react';
+  Spacer,
+  useToast,
+} from '@chakra-ui/react'
+import { FirebaseError } from '@firebase/util'
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  sendEmailVerification,
+} from 'firebase/auth'
+import { FormEvent, useState } from 'react'
 
 export const SignUp = () => {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const toast = useToast()
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    console.log({ email, password });
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    setIsLoading(true)
     e.preventDefault()
+
+    try {
+      const auth = getAuth()
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      )
+      await sendEmailVerification(userCredential.user)
+      setEmail('')
+      setPassword('')
+      toast({
+        title: '確認メールを送信しました。',
+        status: 'success',
+        position: 'top',
+      })
+    } catch (e) {
+      toast({
+        title: 'エラーが発生しました。',
+        status: 'error',
+        position: 'top',
+      })
+
+      if (e instanceof FirebaseError) {
+        console.log(e)
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -55,7 +93,9 @@ export const SignUp = () => {
         </Grid>
         <Spacer height={4} aria-hidden />
         <Center>
-          <Button type={'submit'}>アカウントを作成</Button>
+          <Button type={'submit'} isLoading={isLoading}>
+            アカウントを作成
+          </Button>
         </Center>
       </chakra.form>
     </Container>
