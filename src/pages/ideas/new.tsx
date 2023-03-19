@@ -4,13 +4,13 @@ import {
   Container,
   Input,
   Stack,
-  useToast
+  useToast,
 } from '@chakra-ui/react'
 import {
   addDoc,
   collection,
   getFirestore,
-  serverTimestamp
+  serverTimestamp,
 } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'

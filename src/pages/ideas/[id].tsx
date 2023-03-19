@@ -6,8 +6,7 @@ import {
   Flex,
   Heading,
   IconButton,
-  Input,
-  Spacer,
+  Input, Link, Spacer,
   Text
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
@@ -22,7 +21,7 @@ import {
 } from 'firebase/firestore'
 import { useRouter } from 'next/router'
 import { FormEvent, useEffect, useState } from 'react'
-import { FaHeart } from 'react-icons/fa'
+import { FaHeart, FaMoneyCheckAlt } from 'react-icons/fa'
 
 interface Idea {
   id: string
@@ -76,7 +75,7 @@ const IdeaDetail = () => {
       const ideaRef = doc(db, 'ideas', id)
       const unsubscribe = onSnapshot(ideaRef, (ideaSnapshot) => {
         setIdea(ideaSnapshot.data() as Idea)
-        setLikes(ideaSnapshot.data().likes.length)
+        setLikes(ideaSnapshot.data().likes)
 
         const repliesSnapshot = ideaSnapshot.data().replies
 
@@ -134,17 +133,41 @@ const IdeaDetail = () => {
     <AuthGuard>
       <Container maxW="xl" py={12}>
         <Box boxShadow="lg" p={6} rounded="lg">
-          <Heading size="md">{idea.headline}</Heading>
-          <IconButton
-            aria-label="いいね！"
-            size="md"
-            icon={<FaHeart />}
-            onClick={handleLike}
-            mt={2}
-            isRound
-            colorScheme="red"
-          />
-          {likes}
+          <Flex justifyContent="space-between" alignItems="center">
+            <Heading size="md">{idea.headline}</Heading>
+            <Heading size="xs" ml={4}>
+              {likes >= 20 ? (
+                            <Link
+              href={"/ideas/" + id + "/fund"}
+              fontWeight="bold"
+              textDecoration="none"
+              _hover={{ textDecoration: 'none' }}
+            >
+                <IconButton
+                  aria-label="投資"
+                  size="md"
+                  icon={<FaMoneyCheckAlt />}
+                  ml={2}
+                  isRound
+                  colorScheme="yellow"
+                />
+                </Link>
+              ) : (
+                ''
+              )}
+              <IconButton
+                aria-label="いいね！"
+                size="md"
+                icon={<FaHeart />}
+                onClick={handleLike}
+                ml={2}
+                mr={1}
+                isRound
+                colorScheme="red"
+              />
+              {likes}
+            </Heading>
+          </Flex>
           <Heading size="xs" mt={3}>
             サマリー
           </Heading>
