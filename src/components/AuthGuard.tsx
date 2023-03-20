@@ -1,23 +1,29 @@
-import { Box } from '@chakra-ui/react'
-import { useAuthContext } from '@src/contexts/AuthProvider'
-import { useRouter } from 'next/router'
-import type { ReactNode } from 'react'
+import { Box } from '@chakra-ui/react';
+import useAuth from '@src/hooks/useFirebaseUser';
+import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
+import { useEffect } from "react";
 
 type Props = {
   children: ReactNode
 }
 
 export const AuthGuard = ({ children }: Props) => {
-  const { user } = useAuthContext()
-  const { push } = useRouter()
+  const { user, isLoading: loadingAuth } = useAuth()
+  const router = useRouter()
 
-  if (typeof user === 'undefined') {
-    return <Box>読み込み中...</Box>
-  }
+  useEffect(() => {
+    if (!loadingAuth && !user) {
+      router.push("/signin");
+    }
+  }, [loadingAuth, user, router])
 
-  if (user === null) {
-    push('/signin')
-    return null
+  if (loadingAuth) {
+    return (
+      <Box textAlign="center" w="full" pt="xl">
+        Loading...
+      </Box>
+    )
   }
 
   return <>{children}</>

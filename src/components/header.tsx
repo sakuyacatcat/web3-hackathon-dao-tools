@@ -8,34 +8,30 @@ import {
   useToast
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
-import { useAuthContext } from '@src/contexts/AuthProvider'
-import { getAuth, signOut } from 'firebase/auth'
+import initializeFirebaseClient from '@src/configs/initFirebase'
+import useFirebaseUser from '@src/hooks/useFirebaseUser'
+import { signOut } from 'firebase/auth'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 
 export const Header = () => {
-  const { user } = useAuthContext()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { db, auth } = initializeFirebaseClient()
+  const { user, isLoading: loadingAuth } = useFirebaseUser()
+  const router = useRouter()
   const toast = useToast()
-  const { push } = useRouter()
 
   const handleSignOut = async () => {
-    setIsLoading(true)
     try {
-      const auth = getAuth()
       await signOut(auth)
       toast({
         title: 'ログアウトしました',
         status: 'success',
         position: 'top',
       })
-      push('/signin')
+      router.push('/signin')
     } catch (e) {
       if (e instanceof FirebaseError) {
         console.log(e)
       }
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -57,7 +53,7 @@ export const Header = () => {
             <Button
               colorScheme={'teal'}
               onClick={handleSignOut}
-              isLoading={isLoading}
+              isLoading={loadingAuth}
               ml={4}
             >
               サインアウト

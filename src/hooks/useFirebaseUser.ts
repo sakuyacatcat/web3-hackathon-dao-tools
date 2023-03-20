@@ -13,12 +13,12 @@ export default function useFirebaseUser() {
     const { auth, db } = initializeFirebaseClient();
 
     useEffect(() => {
-        const listener = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const docRef = doc(db, "users", user.uid);
+        const listener = onAuthStateChanged(auth, async (loginUser) => {
+            if (loginUser) {
+                const docRef = doc(db, "users", loginUser.uid);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    setUser({ ...user, role: docSnap.data()?.role });
+                    setUser({ ...loginUser, role: docSnap.data()?.role });
                 }
             } else {
                 setUser(null);
