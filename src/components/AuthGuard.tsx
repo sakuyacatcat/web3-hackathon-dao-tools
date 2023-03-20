@@ -1,5 +1,5 @@
 import { Box } from '@chakra-ui/react'
-import { useAuthContext } from '@src/lib/auth/AuthProvider'
+import { useAuthContext } from '@src/contexts/AuthProvider'
 import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 

@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'
-import { useAuthContext } from '@src/lib/auth/AuthProvider'
+import { useAuthContext } from '@src/contexts/AuthProvider'
 import {
   arrayUnion,
   doc,

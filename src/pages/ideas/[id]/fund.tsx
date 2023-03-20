@@ -1,16 +1,34 @@
 import { Button, Container, Text, VStack } from '@chakra-ui/react'
+import { useAuthContext } from '@src/contexts/AuthProvider'
+import { remainingDate } from '@src/lib/date'
+import {
+  doc, getDoc, getFirestore, updateDoc
+} from 'firebase/firestore'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 const VotePage = () => {
-  const [deadline, setDeadline] = useState(new Date())
+  const { user } = useAuthContext()
+  const router = useRouter()
+  const { id } = router.query
+  const [idea, setIdea] = useState(null)
   const [vote, setVote] = useState(null)
-  const [remaining, setRemaining] = useState('00:00:00')
+  const [deadline, setDeadline] = useState<Date>(new Date())
+  const [remaining, setRemaining] = useState<String>('00:00:00')
+  const db = getFirestore()
 
   // デッドラインを1週間後に設定する
-  const startVoting = () => {
+  const startVoting = async () => {
     const date = new Date()
     date.setDate(date.getDate() + 7)
-    setDeadline(date)
+    try {
+        await updateDoc(doc(db, 'ideas', id), {
+            deadline: date,
+        })
+    } catch (e) {
+        console.log(e);
+    }
+    setRemaining(date)
   }
 
   // 投票処理
@@ -23,20 +41,32 @@ const VotePage = () => {
 
   // 残り時間の計算
   useEffect(() => {
+    const fetchIdea = async () => {
+        const ideaRef = doc(db, 'ideas', id)
+        const ideaSnapshot = await getDoc(ideaRef)
+
+        if (ideaSnapshot.exists()) {
+            setIdea(ideaSnapshot.data())
+            setDeadline(ideaSnapshot.data().deadline)
+        }
+    }
+
+    if (id) {
+        fetchIdea()
+    }
+
+    console.log(deadline);
+    console.log(idea);
+    
+    
+
     const timer = setInterval(() => {
-      const diff = deadline.getTime() - new Date().getTime()
-      if (diff <= 0) {
+      const remainingDateStr = remainingDate(deadline)
+      if (remainingDateStr === '00:00:00') {
         clearInterval(timer)
         setRemaining('投票は締め切られました。')
       } else {
-        const hours = Math.floor(diff / 1000 / 60 / 60)
-        const minutes = Math.floor((diff / 1000 / 60) % 60)
-        const seconds = Math.floor((diff / 1000) % 60)
-        setRemaining(
-          `${hours.toString().padStart(2, '0')}:${minutes
-            .toString()
-            .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-        )
+        setRemaining(remainingDateStr)
       }
     }, 1000)
     return () => clearInterval(timer)

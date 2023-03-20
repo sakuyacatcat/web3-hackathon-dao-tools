@@ -5,10 +5,10 @@ import {
   Flex,
   Heading,
   Link,
-  useToast,
+  useToast
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
-import { useAuthContext } from '@src/lib/auth/AuthProvider'
+import { useAuthContext } from '@src/contexts/AuthProvider'
 import { getAuth, signOut } from 'firebase/auth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'

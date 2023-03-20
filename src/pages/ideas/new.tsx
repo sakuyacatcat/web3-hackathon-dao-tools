@@ -4,17 +4,17 @@ import {
   Container,
   Input,
   Stack,
-  useToast,
+  useToast
 } from '@chakra-ui/react'
 import {
   addDoc,
   collection,
   getFirestore,
-  serverTimestamp,
+  serverTimestamp
 } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'
-import { useAuthContext } from '@src/lib/auth/AuthProvider'
+import { useAuthContext } from '@src/contexts/AuthProvider'
 import { useRouter } from 'next/router'
 import { FormEvent, useState } from 'react'
 
