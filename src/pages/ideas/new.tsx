@@ -5,12 +5,9 @@ import {
   Container,
   Input,
   Stack,
-  useToast
+  useToast,
 } from '@chakra-ui/react'
-import {
-  addDoc,
-  collection, serverTimestamp
-} from '@firebase/firestore'
+import { addDoc, collection, serverTimestamp } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'
 import initializeFirebaseClient from '@src/configs/initFirebase'
@@ -35,8 +32,12 @@ const IdeaInput = ({ message, setFunc, placeholder }: IdeaInputProps) => {
   )
 }
 
-const RequiredIdeaInput = ({ message, setFunc, placeholder }: IdeaInputProps) => {
-  const requiredPlaceholder = placeholder + "(必須)"
+const RequiredIdeaInput = ({
+  message,
+  setFunc,
+  placeholder,
+}: IdeaInputProps) => {
+  const requiredPlaceholder = placeholder + '(必須)'
 
   return (
     <Input
@@ -78,7 +79,7 @@ export const NewIdea = () => {
         customerVoice,
         userUid: user?.uid,
         timestamp: serverTimestamp(),
-        deadline: null,
+        deadlineUnixTime: 0,
         replies: [],
         supports: [],
         votes: [],
@@ -111,13 +112,41 @@ export const NewIdea = () => {
         <Box boxShadow="lg" p={6} rounded="lg">
           <chakra.form onSubmit={handleSubmit}>
             <Stack direction={{ base: 'column', md: 'column' }} spacing={4}>
-              <RequiredIdeaInput message={headline} setFunc={setHeadline} placeholder="見出し" />
-              <RequiredIdeaInput message={summary} setFunc={setSummary} placeholder="概要" />
-              <IdeaInput message={issue} setFunc={setIssue} placeholder="課題" />
-              <IdeaInput message={solution} setFunc={setSolution} placeholder="解決策" />
-              <IdeaInput message={creatorVoice} setFunc={setCreatorVoice} placeholder="発案者の声" />
-              <IdeaInput message={howToStart} setFunc={setHowToStart} placeholder="始め方" />
-              <IdeaInput message={customerVoice} setFunc={setCustomerVoice} placeholder="顧客の声" />
+              <RequiredIdeaInput
+                message={headline}
+                setFunc={setHeadline}
+                placeholder="見出し"
+              />
+              <RequiredIdeaInput
+                message={summary}
+                setFunc={setSummary}
+                placeholder="概要"
+              />
+              <IdeaInput
+                message={issue}
+                setFunc={setIssue}
+                placeholder="課題"
+              />
+              <IdeaInput
+                message={solution}
+                setFunc={setSolution}
+                placeholder="解決策"
+              />
+              <IdeaInput
+                message={creatorVoice}
+                setFunc={setCreatorVoice}
+                placeholder="発案者の声"
+              />
+              <IdeaInput
+                message={howToStart}
+                setFunc={setHowToStart}
+                placeholder="始め方"
+              />
+              <IdeaInput
+                message={customerVoice}
+                setFunc={setCustomerVoice}
+                placeholder="顧客の声"
+              />
               <Button
                 colorScheme="teal"
                 size="lg"

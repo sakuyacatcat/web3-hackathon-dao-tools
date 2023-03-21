@@ -14,7 +14,7 @@ export interface Idea {
   customerVoice: string // 顧客の声
   userUid: string // 作成者
   timestamp: string // 作成日時
-  deadline: Date | null // 締切日
+  deadlineUnixTime: number // 締切日
   replies: [
     {
       // 返信

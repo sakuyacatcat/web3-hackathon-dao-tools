@@ -9,17 +9,14 @@ import {
   Input,
   Link,
   Spacer,
-  Text
+  Text,
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'
 import initializeFirebaseClient from '@src/configs/initFirebase'
 import useFirebaseIdea from '@src/hooks/useFirebaseIdea'
 import useFirebaseUser from '@src/hooks/useFirebaseUser'
-import {
-  arrayUnion,
-  doc, updateDoc
-} from 'firebase/firestore'
+import { arrayUnion, doc, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/router'
 import { FormEvent, useEffect, useState } from 'react'
 import { FaHeart, FaMoneyCheckAlt } from 'react-icons/fa'
@@ -66,7 +63,9 @@ const IdeaDetail = () => {
     if (idea !== null) {
       setReplies(idea.replies)
       setSupportNum(idea.supports.length)
-      setSupported(idea.supports.some((support) => support.userUid === user?.uid ))
+      setSupported(
+        idea.supports.some((support) => support.userUid === user?.uid)
+      )
     }
   }, [idea])
 
@@ -98,7 +97,7 @@ const IdeaDetail = () => {
         supports: arrayUnion({
           userUid: user?.uid,
           timestamp: new Date(),
-        })
+        }),
       })
       setSupportNum(supportNum + 1)
     } catch (e) {
@@ -205,7 +204,10 @@ const IdeaDetail = () => {
         <Spacer height={4} aria-hidden />
         <Flex flexDirection={'column'} overflowY={'auto'} gap={2} height={400}>
           {replies.map((reply, index) => (
-            <ReplyMessage message={reply.message} key={`ChatMessage_${index}`} />
+            <ReplyMessage
+              message={reply.message}
+              key={`ChatMessage_${index}`}
+            />
           ))}
         </Flex>
         <Spacer height={2} aria-hidden />

@@ -1,12 +1,5 @@
-import { Timestamp } from 'firebase/firestore'
-
-export const formatDate = (timestamp: Timestamp) => {
-  const date = timestamp.toDate()
-  return date.toLocaleString()
-}
-
-export const remainingDate = (target: Date) => {
-  const diff = target.getTime() - new Date().getTime()
+export const remainingDate = (unixTime: number): string => {
+  const diff = unixTime - new Date().getTime()
 
   if (diff <= 0) {
     return '00:00:00'
