@@ -13,21 +13,26 @@ import {
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'
+import initializeFirebaseClient from '@src/configs/initFirebase'
 import useFirebaseIdea from '@src/hooks/useFirebaseIdea'
 import useFirebaseUser from '@src/hooks/useFirebaseUser'
 import {
   arrayUnion,
-  doc,
-  getFirestore, updateDoc
+  doc, updateDoc
 } from 'firebase/firestore'
+import { useRouter } from 'next/router'
 import { FormEvent, useEffect, useState } from 'react'
 import { FaHeart, FaMoneyCheckAlt } from 'react-icons/fa'
 
 interface Reply {
-  id: string
+  userUid: string
   message: string
-  author: string
-  timestamp: string
+  timestamp: Date
+}
+
+interface Support {
+  userUid: string
+  timestamp: Date
 }
 
 type ReplyMessageProps = {
@@ -47,17 +52,21 @@ const ReplyMessage = ({ message }: ReplyMessageProps) => {
 }
 
 const IdeaDetail = () => {
-  const { user, isLoading: loadingAuth } = useFirebaseUser()
-  const { idea, isLoading: loadingIdea } = useFirebaseIdea()
+  const { db } = initializeFirebaseClient()
+  const { user } = useFirebaseUser()
+  const { idea } = useFirebaseIdea()
   const [replyMessage, setReplyMessage] = useState<string>('')
   const [replies, setReplies] = useState<Reply[]>([])
-  const [likes, setLikes] = useState<number>(0)
-  const db = getFirestore()
+  const [supportNum, setSupportNum] = useState<number>(0)
+  const [supported, setSupported] = useState<boolean>(false)
+  const router = useRouter()
+  const { id } = router.query
 
   useEffect(() => {
     if (idea !== null) {
       setReplies(idea.replies)
-      setLikes(idea.likes)
+      setSupportNum(idea.supports.length)
+      setSupported(idea.supports.some((support) => support.userUid === user?.uid ))
     }
   }, [idea])
 
@@ -66,11 +75,12 @@ const IdeaDetail = () => {
     try {
       await updateDoc(doc(db, 'ideas', id), {
         replies: arrayUnion({
-          message: message,
-          author: user?.email,
+          userUid: user?.uid,
+          message: replyMessage,
+          timestamp: new Date(),
         }),
       })
-      setMessage('')
+      setReplyMessage('')
     } catch (e) {
       if (e instanceof FirebaseError) {
         console.log(e)
@@ -79,11 +89,18 @@ const IdeaDetail = () => {
   }
 
   const handleLike = async () => {
+    if (supported === true) {
+      return
+    }
+
     try {
       await updateDoc(doc(db, 'ideas', id), {
-        likes: likes + 1,
+        supports: arrayUnion({
+          userUid: user?.uid,
+          timestamp: new Date(),
+        })
       })
-      setLikes(likes + 1)
+      setSupportNum(supportNum + 1)
     } catch (e) {
       if (e instanceof FirebaseError) {
         console.log(e)
@@ -102,7 +119,7 @@ const IdeaDetail = () => {
           <Flex justifyContent="space-between" alignItems="center">
             <Heading size="md">{idea.headline}</Heading>
             <Heading size="xs" ml={4}>
-              {likes >= 20 ? (
+              {supportNum >= 20 ? (
                 <Link
                   href={'/ideas/' + id + '/fund'}
                   fontWeight="bold"
@@ -131,7 +148,7 @@ const IdeaDetail = () => {
                 isRound
                 colorScheme="red"
               />
-              {likes}
+              {supportNum}
             </Heading>
           </Flex>
           <Heading size="xs" mt={3}>
