@@ -1,9 +1,7 @@
 import { Button, Container, Text, VStack } from '@chakra-ui/react'
 import { useAuthContext } from '@src/contexts/AuthProvider'
 import { remainingDate } from '@src/lib/date'
-import {
-  doc, getDoc, getFirestore, updateDoc
-} from 'firebase/firestore'
+import { doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
@@ -22,11 +20,11 @@ const VotePage = () => {
     const date = new Date()
     date.setDate(date.getDate() + 7)
     try {
-        await updateDoc(doc(db, 'ideas', id), {
-            deadline: date,
-        })
+      await updateDoc(doc(db, 'ideas', id), {
+        deadline: date,
+      })
     } catch (e) {
-        console.log(e);
+      console.log(e)
     }
     setRemaining(date)
   }
@@ -42,23 +40,21 @@ const VotePage = () => {
   // 残り時間の計算
   useEffect(() => {
     const fetchIdea = async () => {
-        const ideaRef = doc(db, 'ideas', id)
-        const ideaSnapshot = await getDoc(ideaRef)
+      const ideaRef = doc(db, 'ideas', id)
+      const ideaSnapshot = await getDoc(ideaRef)
 
-        if (ideaSnapshot.exists()) {
-            setIdea(ideaSnapshot.data())
-            setDeadline(ideaSnapshot.data().deadline)
-        }
+      if (ideaSnapshot.exists()) {
+        setIdea(ideaSnapshot.data())
+        setDeadline(ideaSnapshot.data().deadline)
+      }
     }
 
     if (id) {
-        fetchIdea()
+      fetchIdea()
     }
 
-    console.log(deadline);
-    console.log(idea);
-    
-    
+    console.log(deadline)
+    console.log(idea)
 
     const timer = setInterval(() => {
       const remainingDateStr = remainingDate(deadline)

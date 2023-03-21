@@ -1,8 +1,8 @@
-import { Box } from '@chakra-ui/react';
-import useAuth from '@src/hooks/useFirebaseUser';
-import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import { useEffect } from "react";
+import { Box } from '@chakra-ui/react'
+import useAuth from '@src/hooks/useFirebaseUser'
+import { useRouter } from 'next/router'
+import type { ReactNode } from 'react'
+import { useEffect } from 'react'
 
 type Props = {
   children: ReactNode
@@ -14,7 +14,7 @@ export const AuthGuard = ({ children }: Props) => {
 
   useEffect(() => {
     if (!loadingAuth && !user) {
-      router.push("/signin");
+      router.push('/signin')
     }
   }, [loadingAuth, user, router])
 

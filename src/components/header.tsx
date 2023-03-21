@@ -5,7 +5,7 @@ import {
   Flex,
   Heading,
   Link,
-  useToast
+  useToast,
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
 import initializeFirebaseClient from '@src/configs/initFirebase'
