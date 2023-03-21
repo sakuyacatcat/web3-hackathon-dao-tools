@@ -1,4 +1,5 @@
 import { Button, Container, Text, VStack } from '@chakra-ui/react'
+import { AuthGuardAdmin } from '@src/components/AuthGuardAdmin'
 import initializeFirebaseClient from '@src/configs/initFirebase'
 import useFirebaseIdea from '@src/hooks/useFirebaseIdea'
 import useFirebaseUser from '@src/hooks/useFirebaseUser'
@@ -60,43 +61,45 @@ const VotePage = () => {
   }
 
   return (
-    <Container maxW="xl" py={12}>
-      <VStack mt={20}>
-        {deadlineUnixTime === 0 ? (
-          <Button
-            size="lg"
-            colorScheme="blue"
-            onClick={() => handleStartVoting()}
-          >
-            投資を開始する
-          </Button>
-        ) : voted === true ? (
-          <Text fontSize="lg">投票ありがとうございました！</Text>
-        ) : remaining === '00:00:00' ? (
-          <Text fontSize="lg">投票は締め切られました。</Text>
-        ) : (
-          <VStack mt={20}>
-            <Text fontSize="lg" fontWeight="bold">
-              残り時間: {remaining}
-            </Text>
+    <AuthGuardAdmin>
+      <Container maxW="xl" py={12}>
+        <VStack mt={20}>
+          {deadlineUnixTime === 0 ? (
             <Button
               size="lg"
-              colorScheme="green"
-              onClick={() => handleVote('Yes')}
+              colorScheme="blue"
+              onClick={() => handleStartVoting()}
             >
-              Yes
+              投資を開始する
             </Button>
-            <Button
-              size="lg"
-              colorScheme="red"
-              onClick={() => handleVote('No')}
-            >
-              No
-            </Button>
-          </VStack>
-        )}
-      </VStack>
-    </Container>
+          ) : voted === true ? (
+            <Text fontSize="lg">投票ありがとうございました！</Text>
+          ) : remaining === '00:00:00' ? (
+            <Text fontSize="lg">投票は締め切られました。</Text>
+          ) : (
+            <VStack mt={20}>
+              <Text fontSize="lg" fontWeight="bold">
+                残り時間: {remaining}
+              </Text>
+              <Button
+                size="lg"
+                colorScheme="green"
+                onClick={() => handleVote('Yes')}
+              >
+                Yes
+              </Button>
+              <Button
+                size="lg"
+                colorScheme="red"
+                onClick={() => handleVote('No')}
+              >
+                No
+              </Button>
+            </VStack>
+          )}
+        </VStack>
+      </Container>
+    </AuthGuardAdmin>
   )
 }
 
