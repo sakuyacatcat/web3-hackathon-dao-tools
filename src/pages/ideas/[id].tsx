@@ -6,36 +6,22 @@ import {
   Flex,
   Heading,
   IconButton,
-  Input, Link, Spacer,
+  Input,
+  Link,
+  Spacer,
   Text
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'
-import { useAuthContext } from '@src/contexts/AuthProvider'
+import useFirebaseIdea from '@src/hooks/useFirebaseIdea'
+import useFirebaseUser from '@src/hooks/useFirebaseUser'
 import {
   arrayUnion,
   doc,
-  getFirestore,
-  onSnapshot,
-  updateDoc
+  getFirestore, updateDoc
 } from 'firebase/firestore'
-import { useRouter } from 'next/router'
 import { FormEvent, useEffect, useState } from 'react'
 import { FaHeart, FaMoneyCheckAlt } from 'react-icons/fa'
-
-interface Idea {
-  id: string
-  headline: string
-  summary: string
-  issue: string
-  solution: string
-  creatorVoice: string
-  howToStart: string
-  customerVoice: string
-  author: string
-  timestamp: string
-  likes: number
-}
 
 interface Reply {
   id: string
@@ -44,11 +30,11 @@ interface Reply {
   timestamp: string
 }
 
-type MessageProps = {
+type ReplyMessageProps = {
   message: string
 }
 
-const Message = ({ message }: MessageProps) => {
+const ReplyMessage = ({ message }: ReplyMessageProps) => {
   return (
     <Flex alignItems={'start'}>
       <Box ml={2}>
@@ -61,39 +47,19 @@ const Message = ({ message }: MessageProps) => {
 }
 
 const IdeaDetail = () => {
-  const { user } = useAuthContext()
-  const router = useRouter()
-  const { id } = router.query
-  const [idea, setIdea] = useState<Idea>()
+  const { user, isLoading: loadingAuth } = useFirebaseUser()
+  const { idea, isLoading: loadingIdea } = useFirebaseIdea()
+  const [replyMessage, setReplyMessage] = useState<string>('')
   const [replies, setReplies] = useState<Reply[]>([])
-  const [message, setMessage] = useState<string>('')
   const [likes, setLikes] = useState<number>(0)
   const db = getFirestore()
 
   useEffect(() => {
-    const fetchIdea = async () => {
-      const ideaRef = doc(db, 'ideas', id)
-      const unsubscribe = onSnapshot(ideaRef, (ideaSnapshot) => {
-        setIdea(ideaSnapshot.data() as Idea)
-        setLikes(ideaSnapshot.data().likes)
-
-        const repliesSnapshot = ideaSnapshot.data().replies
-
-        if (repliesSnapshot) {
-          const replyList = repliesSnapshot.map((reply, id) => ({
-            id: id,
-            message: reply.message,
-            author: reply.author,
-          }))
-          setReplies(replyList)
-        }
-      })
+    if (idea !== null) {
+      setReplies(idea.replies)
+      setLikes(idea.likes)
     }
-
-    if (id) {
-      fetchIdea()
-    }
-  }, [id])
+  }, [idea])
 
   const handleSubmit = async (e: FormEvent<HTMLAllCollection>) => {
     e.preventDefault()
@@ -137,20 +103,20 @@ const IdeaDetail = () => {
             <Heading size="md">{idea.headline}</Heading>
             <Heading size="xs" ml={4}>
               {likes >= 20 ? (
-                            <Link
-              href={"/ideas/" + id + "/fund"}
-              fontWeight="bold"
-              textDecoration="none"
-              _hover={{ textDecoration: 'none' }}
-            >
-                <IconButton
-                  aria-label="投資"
-                  size="md"
-                  icon={<FaMoneyCheckAlt />}
-                  ml={2}
-                  isRound
-                  colorScheme="yellow"
-                />
+                <Link
+                  href={'/ideas/' + id + '/fund'}
+                  fontWeight="bold"
+                  textDecoration="none"
+                  _hover={{ textDecoration: 'none' }}
+                >
+                  <IconButton
+                    aria-label="投資"
+                    size="md"
+                    icon={<FaMoneyCheckAlt />}
+                    ml={2}
+                    isRound
+                    colorScheme="yellow"
+                  />
                 </Link>
               ) : (
                 ''
@@ -210,8 +176,8 @@ const IdeaDetail = () => {
           <Input
             placeholder="カイゼン意見を伝えよう"
             size="lg"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            value={replyMessage}
+            onChange={(e) => setReplyMessage(e.target.value)}
             required
             aria-required
           />
@@ -222,7 +188,7 @@ const IdeaDetail = () => {
         <Spacer height={4} aria-hidden />
         <Flex flexDirection={'column'} overflowY={'auto'} gap={2} height={400}>
           {replies.map((reply, index) => (
-            <Message message={reply.message} key={`ChatMessage_${index}`} />
+            <ReplyMessage message={reply.message} key={`ChatMessage_${index}`} />
           ))}
         </Flex>
         <Spacer height={2} aria-hidden />
