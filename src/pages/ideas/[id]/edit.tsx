@@ -3,90 +3,59 @@ import {
   Button,
   chakra,
   Container,
-  Input,
   Stack,
   useToast,
 } from '@chakra-ui/react'
-import { addDoc, collection, serverTimestamp } from '@firebase/firestore'
+import { doc, serverTimestamp, updateDoc } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'
 import initializeFirebaseClient from '@src/configs/initFirebase'
-import useFirebaseUser from '@src/hooks/useFirebaseUser'
+import useFirebaseIdea from '@src/hooks/useFirebaseIdea'
 import { useRouter } from 'next/router'
-import { Dispatch, FormEvent, SetStateAction, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
+import { IdeaInput, RequiredIdeaInput } from '../new'
 
-type IdeaInputProps = {
-  message: string
-  setFunc: Dispatch<SetStateAction<string>>
-  placeholder: string
-}
-
-export const IdeaInput = ({
-  message,
-  setFunc,
-  placeholder,
-}: IdeaInputProps) => {
-  return (
-    <Input
-      placeholder={placeholder}
-      size="lg"
-      value={message}
-      onChange={(e) => setFunc(e.target.value)}
-    />
-  )
-}
-
-export const RequiredIdeaInput = ({
-  message,
-  setFunc,
-  placeholder,
-}: IdeaInputProps) => {
-  const requiredPlaceholder = placeholder + '(必須)'
-
-  return (
-    <Input
-      placeholder={requiredPlaceholder}
-      size="lg"
-      value={message}
-      onChange={(e) => setFunc(e.target.value)}
-      required
-      aria-required
-    />
-  )
-}
-
-export const NewIdea = () => {
+export const EditIdea = () => {
   const { db } = initializeFirebaseClient()
-  const { user } = useFirebaseUser()
-  const [headline, setHeadline] = useState('')
-  const [summary, setSummary] = useState('')
-  const [issue, setIssue] = useState('')
-  const [solution, setSolution] = useState('')
-  const [creatorVoice, setCreatorVoice] = useState('')
-  const [howToStart, setHowToStart] = useState('')
-  const [customerVoice, setCustomerVoice] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const { idea } = useFirebaseIdea()
+  const [headline, setHeadline] = useState<string>('')
+  const [summary, setSummary] = useState<string>('')
+  const [issue, setIssue] = useState<string>('')
+  const [solution, setSolution] = useState<string>('')
+  const [creatorVoice, setCreatorVoice] = useState<string>('')
+  const [howToStart, setHowToStart] = useState<string>('')
+  const [customerVoice, setCustomerVoice] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const toast = useToast()
   const router = useRouter()
+  const { id } = router.query
+
+  useEffect(() => {
+    if (idea !== null) {
+      setHeadline(idea.headline)
+      setSummary(idea.summary)
+      setIssue(idea.issue)
+      setSolution(idea.solution)
+      setCreatorVoice(idea.creatorVoice)
+      setHowToStart(idea.howToStart)
+      setCustomerVoice(idea.customerVoice)
+    }
+  }, [idea])
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     setIsLoading(true)
     e.preventDefault()
+
     try {
-      await addDoc(collection(db, 'ideas'), {
-        headline,
-        summary,
-        issue,
-        solution,
-        creatorVoice,
-        howToStart,
-        customerVoice,
-        userUid: user?.uid,
+      await updateDoc(doc(db, 'ideas', id), {
+        headline: headline,
+        summary: summary,
+        issue: issue,
+        solution: solution,
+        creatorVoice: creatorVoice,
+        howToStart: howToStart,
+        customerVoice: customerVoice,
         timestamp: serverTimestamp(),
-        deadlineUnixTime: 0,
-        replies: [],
-        supports: [],
-        votes: [],
       })
       setHeadline('')
       setSummary('')
@@ -95,12 +64,14 @@ export const NewIdea = () => {
       setCreatorVoice('')
       setHowToStart('')
       setCustomerVoice('')
+
+      router.push('/ideas/' + id)
+
       toast({
-        title: 'アイデア投稿しました',
+        title: 'アイデア更新しました',
         status: 'success',
         position: 'top',
       })
-      router.push('/')
     } catch (e) {
       if (e instanceof FirebaseError) {
         console.log(e)
@@ -157,7 +128,7 @@ export const NewIdea = () => {
                 type="submit"
                 isLoading={isLoading}
               >
-                投稿
+                更新
               </Button>
             </Stack>
           </chakra.form>
@@ -167,4 +138,4 @@ export const NewIdea = () => {
   )
 }
 
-export default { NewIdea, RequiredIdeaInput, IdeaInput }
+export default EditIdea

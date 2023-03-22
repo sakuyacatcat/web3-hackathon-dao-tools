@@ -80,7 +80,8 @@ export default function Home() {
                       <Heading size="md">{idea.headline}</Heading>
                       <Text>{idea.summary}</Text>
                       <Text fontSize="sm" color="gray.500">
-                        by {idea.author}
+                        by
+                        0xa2c23b3162e4afc875ea16780af8237e4faafde1ef045ed3dfb5cad6fa3e7cf0
                       </Text>
                     </VStack>
                   </Center>

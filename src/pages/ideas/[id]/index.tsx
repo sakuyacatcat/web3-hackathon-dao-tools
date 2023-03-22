@@ -6,49 +6,37 @@ import {
   Flex,
   Heading,
   IconButton,
-  Input, Link, Spacer,
-  Text
+  Input,
+  Link,
+  Spacer,
+  Text,
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'
-import { useAuthContext } from '@src/lib/auth/AuthProvider'
-import {
-  arrayUnion,
-  doc,
-  getFirestore,
-  onSnapshot,
-  updateDoc
-} from 'firebase/firestore'
+import initializeFirebaseClient from '@src/configs/initFirebase'
+import useFirebaseIdea from '@src/hooks/useFirebaseIdea'
+import useFirebaseUser from '@src/hooks/useFirebaseUser'
+import { arrayUnion, doc, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/router'
 import { FormEvent, useEffect, useState } from 'react'
-import { FaHeart, FaMoneyCheckAlt } from 'react-icons/fa'
-
-interface Idea {
-  id: string
-  headline: string
-  summary: string
-  issue: string
-  solution: string
-  creatorVoice: string
-  howToStart: string
-  customerVoice: string
-  author: string
-  timestamp: string
-  likes: number
-}
+import { FaEdit, FaEthereum, FaHeart } from 'react-icons/fa'
 
 interface Reply {
-  id: string
+  userUid: string
   message: string
-  author: string
-  timestamp: string
+  timestamp: Date
 }
 
-type MessageProps = {
+interface Support {
+  userUid: string
+  timestamp: Date
+}
+
+type ReplyMessageProps = {
   message: string
 }
 
-const Message = ({ message }: MessageProps) => {
+const ReplyMessage = ({ message }: ReplyMessageProps) => {
   return (
     <Flex alignItems={'start'}>
       <Box ml={2}>
@@ -61,50 +49,37 @@ const Message = ({ message }: MessageProps) => {
 }
 
 const IdeaDetail = () => {
-  const { user } = useAuthContext()
+  const { db } = initializeFirebaseClient()
+  const { user } = useFirebaseUser()
+  const { idea } = useFirebaseIdea()
+  const [replyMessage, setReplyMessage] = useState<string>('')
+  const [replies, setReplies] = useState<Reply[]>([])
+  const [supportNum, setSupportNum] = useState<number>(0)
+  const [supported, setSupported] = useState<boolean>(false)
   const router = useRouter()
   const { id } = router.query
-  const [idea, setIdea] = useState<Idea>()
-  const [replies, setReplies] = useState<Reply[]>([])
-  const [message, setMessage] = useState<string>('')
-  const [likes, setLikes] = useState<number>(0)
-  const db = getFirestore()
 
   useEffect(() => {
-    const fetchIdea = async () => {
-      const ideaRef = doc(db, 'ideas', id)
-      const unsubscribe = onSnapshot(ideaRef, (ideaSnapshot) => {
-        setIdea(ideaSnapshot.data() as Idea)
-        setLikes(ideaSnapshot.data().likes)
-
-        const repliesSnapshot = ideaSnapshot.data().replies
-
-        if (repliesSnapshot) {
-          const replyList = repliesSnapshot.map((reply, id) => ({
-            id: id,
-            message: reply.message,
-            author: reply.author,
-          }))
-          setReplies(replyList)
-        }
-      })
+    if (idea !== null) {
+      setReplies(idea.replies)
+      setSupportNum(idea.supports.length)
+      setSupported(
+        idea.supports.some((support) => support.userUid === user?.uid)
+      )
     }
-
-    if (id) {
-      fetchIdea()
-    }
-  }, [id])
+  }, [idea])
 
   const handleSubmit = async (e: FormEvent<HTMLAllCollection>) => {
     e.preventDefault()
     try {
       await updateDoc(doc(db, 'ideas', id), {
         replies: arrayUnion({
-          message: message,
-          author: user?.email,
+          userUid: user?.uid,
+          message: replyMessage,
+          timestamp: new Date(),
         }),
       })
-      setMessage('')
+      setReplyMessage('')
     } catch (e) {
       if (e instanceof FirebaseError) {
         console.log(e)
@@ -113,11 +88,18 @@ const IdeaDetail = () => {
   }
 
   const handleLike = async () => {
+    if (supported === true) {
+      return
+    }
+
     try {
       await updateDoc(doc(db, 'ideas', id), {
-        likes: likes + 1,
+        supports: arrayUnion({
+          userUid: user?.uid,
+          timestamp: new Date(),
+        }),
       })
-      setLikes(likes + 1)
+      setSupportNum(supportNum + 1)
     } catch (e) {
       if (e instanceof FirebaseError) {
         console.log(e)
@@ -133,28 +115,42 @@ const IdeaDetail = () => {
     <AuthGuard>
       <Container maxW="xl" py={12}>
         <Box boxShadow="lg" p={6} rounded="lg">
-          <Flex justifyContent="space-between" alignItems="center">
-            <Heading size="md">{idea.headline}</Heading>
-            <Heading size="xs" ml={4}>
-              {likes >= 20 ? (
-                            <Link
-              href={"/ideas/" + id + "/fund"}
-              fontWeight="bold"
-              textDecoration="none"
-              _hover={{ textDecoration: 'none' }}
-            >
-                <IconButton
-                  aria-label="投資"
-                  size="md"
-                  icon={<FaMoneyCheckAlt />}
-                  ml={2}
-                  isRound
-                  colorScheme="yellow"
-                />
+          <Flex justifyContent="space-between" alignItems="normal">
+            <Heading size="xs" mr={4} mb={4}>
+              {supportNum >= 20 && user?.role === 'administrator' ? (
+                <Link
+                  href={'/ideas/' + id + '/fund'}
+                  fontWeight="bold"
+                  textDecoration="none"
+                  _hover={{ textDecoration: 'none' }}
+                >
+                  <IconButton
+                    aria-label="投資"
+                    size="md"
+                    icon={<FaEthereum />}
+                    ml={2}
+                    isRound
+                    colorScheme="yellow"
+                  />
                 </Link>
               ) : (
                 ''
               )}
+              <Link
+                href={'/ideas/' + id + '/edit'}
+                fontWeight="bold"
+                textDecoration="none"
+                _hover={{ textDecoration: 'none' }}
+              >
+                <IconButton
+                  aria-label="編集"
+                  size="md"
+                  icon={<FaEdit />}
+                  ml={2}
+                  isRound
+                  colorScheme="blackAlpha"
+                />
+              </Link>
               <IconButton
                 aria-label="いいね！"
                 size="md"
@@ -165,9 +161,10 @@ const IdeaDetail = () => {
                 isRound
                 colorScheme="red"
               />
-              {likes}
+              {supportNum}
             </Heading>
           </Flex>
+          <Heading size="md">{idea.headline}</Heading>
           <Heading size="xs" mt={3}>
             サマリー
           </Heading>
@@ -210,8 +207,8 @@ const IdeaDetail = () => {
           <Input
             placeholder="カイゼン意見を伝えよう"
             size="lg"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            value={replyMessage}
+            onChange={(e) => setReplyMessage(e.target.value)}
             required
             aria-required
           />
@@ -222,7 +219,10 @@ const IdeaDetail = () => {
         <Spacer height={4} aria-hidden />
         <Flex flexDirection={'column'} overflowY={'auto'} gap={2} height={400}>
           {replies.map((reply, index) => (
-            <Message message={reply.message} key={`ChatMessage_${index}`} />
+            <ReplyMessage
+              message={reply.message}
+              key={`ChatMessage_${index}`}
+            />
           ))}
         </Flex>
         <Spacer height={2} aria-hidden />
