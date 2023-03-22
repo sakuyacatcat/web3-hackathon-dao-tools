@@ -19,7 +19,7 @@ import useFirebaseUser from '@src/hooks/useFirebaseUser'
 import { arrayUnion, doc, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/router'
 import { FormEvent, useEffect, useState } from 'react'
-import { FaHeart, FaMoneyCheckAlt } from 'react-icons/fa'
+import { FaEdit, FaEthereum, FaHeart } from 'react-icons/fa'
 
 interface Reply {
   userUid: string
@@ -115,10 +115,9 @@ const IdeaDetail = () => {
     <AuthGuard>
       <Container maxW="xl" py={12}>
         <Box boxShadow="lg" p={6} rounded="lg">
-          <Flex justifyContent="space-between" alignItems="center">
-            <Heading size="md">{idea.headline}</Heading>
-            <Heading size="xs" ml={4}>
-              {supportNum >= 20 ? (
+          <Flex justifyContent="space-between" alignItems="normal">
+            <Heading size="xs" mr={4} mb={4}>
+              {supportNum >= 20 && user?.role === 'administrator' ? (
                 <Link
                   href={'/ideas/' + id + '/fund'}
                   fontWeight="bold"
@@ -128,7 +127,7 @@ const IdeaDetail = () => {
                   <IconButton
                     aria-label="投資"
                     size="md"
-                    icon={<FaMoneyCheckAlt />}
+                    icon={<FaEthereum />}
                     ml={2}
                     isRound
                     colorScheme="yellow"
@@ -137,6 +136,21 @@ const IdeaDetail = () => {
               ) : (
                 ''
               )}
+              <Link
+                href={'/ideas/' + id + '/edit'}
+                fontWeight="bold"
+                textDecoration="none"
+                _hover={{ textDecoration: 'none' }}
+              >
+                <IconButton
+                  aria-label="編集"
+                  size="md"
+                  icon={<FaEdit />}
+                  ml={2}
+                  isRound
+                  colorScheme="blackAlpha"
+                />
+              </Link>
               <IconButton
                 aria-label="いいね！"
                 size="md"
@@ -150,6 +164,7 @@ const IdeaDetail = () => {
               {supportNum}
             </Heading>
           </Flex>
+          <Heading size="md">{idea.headline}</Heading>
           <Heading size="xs" mt={3}>
             サマリー
           </Heading>
