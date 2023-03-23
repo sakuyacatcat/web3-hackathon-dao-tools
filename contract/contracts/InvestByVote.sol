@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 import '../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 contract InvestByVote {
-  event invest(uint256 _votes, uint256 _amount);
+  event Investment(uint256 _votes, uint256 _amount);
 
   IERC20 public jpycToken;
   address payable public owner;
@@ -15,12 +15,15 @@ contract InvestByVote {
   }
 
   function transferJpycWithVotes(address recipient, uint256 votes) external {
-    require(msg.sender == owner);
-    uint256 amount = votes * 100000 * (10 ** 18); // 1 vote = 100,000 JPYC
+    require(msg.sender == owner, 'This contract is called by only owner');
+    uint256 amountJpyc = votes * 100_000; // 1 vote = 100_000 JPYC
+    uint256 amountWei = amountJpyc * (10 ** 18);
     require(
-      jpycToken.balanceOf(msg.sender) >= amount,
+      jpycToken.balanceOf(address(this)) >= amountWei,
       'Insufficient JPYC balance'
     );
-    jpycToken.transferFrom(msg.sender, recipient, amount);
+    jpycToken.transfer(recipient, amountWei);
+
+    emit Investment(votes, amountJpyc);
   }
 }
