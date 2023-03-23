@@ -5,11 +5,12 @@ import {
   GridItem,
   Heading,
   Text,
-  VStack,
+  VStack
 } from '@chakra-ui/react'
 import { AuthGuard } from '@src/components/AuthGuard'
+import initializeFirebaseClient from '@src/configs/initFirebase'
 import useFirebaseUser from '@src/hooks/useFirebaseUser'
-import { collection, getDocs, getFirestore } from 'firebase/firestore'
+import { collection, getDocs } from 'firebase/firestore'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -30,10 +31,10 @@ interface Idea {
 export default function Home() {
   const [ideas, setIdeas] = useState<Idea[]>([])
   const { user } = useFirebaseUser()
+  const { db } = initializeFirebaseClient()
 
   useEffect(() => {
     const fetchData = async () => {
-      const db = getFirestore()
       const ideaCollection = collection(db, 'ideas')
       const ideaSnapshot = await getDocs(ideaCollection)
       const ideaList = ideaSnapshot.docs.map((doc) => ({
