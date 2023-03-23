@@ -5,7 +5,7 @@ import {
   GridItem,
   Heading,
   Text,
-  VStack
+  VStack,
 } from '@chakra-ui/react'
 import { AuthGuard } from '@src/components/AuthGuard'
 import useFirebaseUser from '@src/hooks/useFirebaseUser'

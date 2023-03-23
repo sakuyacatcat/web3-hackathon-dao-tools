@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import "@nomiclabs/hardhat-ethers";
-import "@nomiclabs/hardhat-waffle";
-import { HardhatUserConfig } from 'hardhat/config';
+import '@nomiclabs/hardhat-ethers'
+import '@nomiclabs/hardhat-waffle'
+import { HardhatUserConfig } from 'hardhat/config'
 
-import dotenv from 'dotenv';
+import dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -34,6 +34,6 @@ const config: HardhatUserConfig = {
   mocha: {
     timeout: 60_000,
   },
-};
+}
 
-export default config;
+export default config

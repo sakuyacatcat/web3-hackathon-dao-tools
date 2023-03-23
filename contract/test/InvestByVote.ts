@@ -15,28 +15,42 @@ describe('InvestByVote', function () {
 
     const totalSupply = amountWei.toLocaleString().replace(/,/g, '')
     const DummyJPYC = await ethers.getContractFactory('MyToken')
-    const dummyJPYC = await DummyJPYC.deploy("JapanCoin", "JPYC", totalSupply)
+    const dummyJPYC = await DummyJPYC.deploy('JapanCoin', 'JPYC', totalSupply)
 
     const jpycAddress = dummyJPYC.address
 
     const InvestByVote = await ethers.getContractFactory('InvestByVote')
     const investByVote = await InvestByVote.deploy(jpycAddress)
 
-    await dummyJPYC.approve(investByVote.address, totalSupply);
-    await dummyJPYC.transfer(investByVote.address, totalSupply);
+    await dummyJPYC.approve(investByVote.address, totalSupply)
+    await dummyJPYC.transfer(investByVote.address, totalSupply)
 
-    return { investByVote, dummyJPYC, jpycAddress, owner, otherAccount, votes, overVotes, amountWei, amountJpyc }
+    return {
+      investByVote,
+      dummyJPYC,
+      jpycAddress,
+      owner,
+      otherAccount,
+      votes,
+      overVotes,
+      amountWei,
+      amountJpyc,
+    }
   }
 
   describe('Deployment', function () {
     it('Should set the right owner', async function () {
-      const { investByVote, owner } = await loadFixture(deployInvestByVoteFixture)
+      const { investByVote, owner } = await loadFixture(
+        deployInvestByVoteFixture
+      )
 
       expect(await investByVote.owner()).to.equal(owner.address)
     })
 
     it('Should set the right jpyc address', async function () {
-      const { investByVote, jpycAddress } = await loadFixture(deployInvestByVoteFixture)
+      const { investByVote, jpycAddress } = await loadFixture(
+        deployInvestByVoteFixture
+      )
 
       expect(await investByVote.jpycToken()).to.equal(jpycAddress)
     })
@@ -49,27 +63,32 @@ describe('InvestByVote', function () {
           deployInvestByVoteFixture
         )
 
-        await expect(investByVote.connect(otherAccount).transferJpycWithVotes(owner.address, votes)).to.be.revertedWith(
-          'This contract is called by only owner'
-        )
+        await expect(
+          investByVote
+            .connect(otherAccount)
+            .transferJpycWithVotes(owner.address, votes)
+        ).to.be.revertedWith('This contract is called by only owner')
       })
 
       it("Shouldn't fail if the invest amount has overed JPYC balance", async function () {
-        const { investByVote, otherAccount, overVotes } = await loadFixture(deployInvestByVoteFixture)
-
-        await expect(investByVote.transferJpycWithVotes(otherAccount.address, overVotes)).to.be.revertedWith(
-          'Insufficient JPYC balance'
+        const { investByVote, otherAccount, overVotes } = await loadFixture(
+          deployInvestByVoteFixture
         )
+
+        await expect(
+          investByVote.transferJpycWithVotes(otherAccount.address, overVotes)
+        ).to.be.revertedWith('Insufficient JPYC balance')
       })
     })
 
     describe('Events', function () {
       it('Should emit an event on investments', async function () {
-        const { investByVote, otherAccount, votes, amountJpyc } = await loadFixture(
-          deployInvestByVoteFixture
-        )
+        const { investByVote, otherAccount, votes, amountJpyc } =
+          await loadFixture(deployInvestByVoteFixture)
 
-        await expect(investByVote.transferJpycWithVotes(otherAccount.address, votes))
+        await expect(
+          investByVote.transferJpycWithVotes(otherAccount.address, votes)
+        )
           .to.emit(investByVote, 'Investment')
           .withArgs(votes, amountJpyc)
       })
@@ -77,14 +96,15 @@ describe('InvestByVote', function () {
 
     describe('Investments', function () {
       it('Should invest the funds to the recipient', async function () {
-        const { investByVote, otherAccount, votes, dummyJPYC, amountWei } = await loadFixture(
-          deployInvestByVoteFixture
-        )
+        const { investByVote, otherAccount, votes, dummyJPYC, amountWei } =
+          await loadFixture(deployInvestByVoteFixture)
 
         investByVote.transferJpycWithVotes(otherAccount.address, votes)
-        const amountWeiStr = amountWei.toLocaleString().replace(/,/g, "")
+        const amountWeiStr = amountWei.toLocaleString().replace(/,/g, '')
 
-        expect(await dummyJPYC.balanceOf(otherAccount.address)).to.equal(amountWeiStr)
+        expect(await dummyJPYC.balanceOf(otherAccount.address)).to.equal(
+          amountWeiStr
+        )
       })
     })
   })

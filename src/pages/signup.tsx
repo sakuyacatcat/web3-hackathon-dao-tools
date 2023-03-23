@@ -12,7 +12,7 @@ import {
   Link,
   Select,
   Spacer,
-  useToast
+  useToast,
 } from '@chakra-ui/react'
 import { doc, getFirestore, setDoc } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
@@ -20,7 +20,7 @@ import { createWeb3Account } from '@src/lib/createWeb3Account'
 import {
   createUserWithEmailAndPassword,
   getAuth,
-  sendEmailVerification
+  sendEmailVerification,
 } from 'firebase/auth'
 import { FormEvent, useState } from 'react'
 
@@ -43,7 +43,7 @@ export const SignUp = () => {
         email,
         password
       )
-      const account = createWeb3Account();
+      const account = createWeb3Account()
 
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         email: userCredential.user.email,

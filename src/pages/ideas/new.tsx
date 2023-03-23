@@ -5,7 +5,7 @@ import {
   Container,
   Input,
   Stack,
-  useToast
+  useToast,
 } from '@chakra-ui/react'
 import { addDoc, collection, serverTimestamp } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
