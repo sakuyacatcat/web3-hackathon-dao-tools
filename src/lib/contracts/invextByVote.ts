@@ -30,12 +30,20 @@ export default async function investByVote(recipient: string, votes: number) {
     if (signedTx.rawTransaction) {
       const eventData = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
       const receipt = await web3.eth.getTransactionReceipt(eventData.transactionHash)
-
-      const investEvent = contract.getPastEvents('Investment', {
+      contract.getPastEvents('Investment', {
         fromBlock: receipt.blockNumber,
-        toBlock: receipt.blockNumber,
+      }, function(error, events){
+        if (error) {
+          console.log(error);
+        } else if (events[0].returnValues) {
+          alert(`
+            Investment complete!\n
+            Recipient address: ${recipient}\n
+            Votes: ${events[0].returnValues[0]}\n
+            Amount: ${events[0].returnValues[1]} JPYC
+          `)
+        }
       })
-      console.log(investEvent)
     }
   } catch (e) {
     console.log(e)
