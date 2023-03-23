@@ -5,7 +5,7 @@ import {
   Container,
   Input,
   Stack,
-  useToast,
+  useToast
 } from '@chakra-ui/react'
 import { addDoc, collection, serverTimestamp } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
@@ -167,4 +167,4 @@ export const NewIdea = () => {
   )
 }
 
-export default { NewIdea, RequiredIdeaInput, IdeaInput }
+export default NewIdea
