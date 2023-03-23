@@ -1,11 +1,8 @@
-import { NODE_ENDPOINT } from '@src/configs/constant/env';
-import Web3 from 'web3';
-import { Account } from 'web3-core';
-
-const web3 = new Web3(NODE_ENDPOINT);
+import { Account } from 'web3-core'
+import { web3 } from './web3Provier'
 
 export function createWeb3Account(): Account {
-  const account = web3.eth.accounts.create();
+  const account = web3.eth.accounts.create()
 
-  return account;
+  return account
 }
