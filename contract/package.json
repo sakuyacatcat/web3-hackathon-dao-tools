@@ -5,11 +5,9 @@
     "build:ts": "tsc -p tsconfig.json",
     "build:sol": "hardhat compile",
     "start:node": "hardhat node",
-    "deploy:dry": "hardhat run scripts/deploy_invest_by_vote.ts",
-    "deploy:local:invest": "hardhat run scripts/deploy_invest_by_vote.ts --network localhost",
-    "deploy:local:token": "hardhat run scripts/deploy_my_token.ts --network localhost",
-    "deploy:goerli:invest": "hardhat run scripts/deploy_invest_by_vote.ts --network goerli",
-    "deploy:goerli:token": "hardhat run scripts/deploy_my_token.ts --network goerli",
+    "deploy:dry": "hardhat run scripts/deploy_testnet.ts",
+    "deploy:local": "hardhat run scripts/deploy_testnet.ts --network localhost",
+    "deploy:goerli": "hardhat run scripts/deploy_testnet.ts --network goerli",
     "test": "hardhat test"
   },
   "devDependencies": {
