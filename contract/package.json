@@ -1,0 +1,24 @@
+{
+  "scripts": {
+    "clean": "rimraf artifacts cache typechain-types",
+    "build": "npm run build:sol && npm run build:ts",
+    "build:ts": "tsc -p tsconfig.json",
+    "build:sol": "hardhat compile",
+    "start:node": "hardhat node",
+    "deploy:dry": "hardhat run scripts/deploy_testnet.ts",
+    "deploy:local": "hardhat run scripts/deploy_testnet.ts --network localhost",
+    "deploy:goerli": "hardhat run scripts/deploy_testnet.ts --network goerli",
+    "test": "hardhat test"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.5",
+    "@openzeppelin/contracts": "^4.8.2",
+    "chai": "^4.3.7",
+    "dotenv": "^16.0.3",
+    "ethereum-waffle": "^4.0.10",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.13.0"
+  }
+}

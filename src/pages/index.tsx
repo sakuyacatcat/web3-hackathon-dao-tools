@@ -5,10 +5,12 @@ import {
   GridItem,
   Heading,
   Text,
-  VStack,
+  VStack
 } from '@chakra-ui/react'
 import { AuthGuard } from '@src/components/AuthGuard'
-import { collection, getDocs, getFirestore } from 'firebase/firestore'
+import initializeFirebaseClient from '@src/configs/initFirebase'
+import useFirebaseUser from '@src/hooks/useFirebaseUser'
+import { collection, getDocs } from 'firebase/firestore'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -28,10 +30,11 @@ interface Idea {
 
 export default function Home() {
   const [ideas, setIdeas] = useState<Idea[]>([])
+  const { user } = useFirebaseUser()
+  const { db } = initializeFirebaseClient()
 
   useEffect(() => {
     const fetchData = async () => {
-      const db = getFirestore()
       const ideaCollection = collection(db, 'ideas')
       const ideaSnapshot = await getDocs(ideaCollection)
       const ideaList = ideaSnapshot.docs.map((doc) => ({
@@ -69,8 +72,7 @@ export default function Home() {
               <GridItem key={idea.id} colSpan={1}>
                 <Link href={`/ideas/${idea.id}`}>
                   <Center
-                    h="200px"
-                    w="100%"
+                    h="250px"
                     rounded="md"
                     boxShadow="md"
                     p={4}
@@ -80,8 +82,10 @@ export default function Home() {
                       <Heading size="md">{idea.headline}</Heading>
                       <Text>{idea.summary}</Text>
                       <Text fontSize="sm" color="gray.500">
-                        by
-                        0xa2c23b3162e4afc875ea16780af8237e4faafde1ef045ed3dfb5cad6fa3e7cf0
+                        by {user?.role}
+                      </Text>
+                      <Text fontSize="sm" color="gray.500">
+                        {user?.address}
                       </Text>
                     </VStack>
                   </Center>

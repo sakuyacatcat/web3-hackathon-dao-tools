@@ -9,7 +9,7 @@ import {
   Input,
   Link,
   Spacer,
-  Text,
+  Text
 } from '@chakra-ui/react'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/components/AuthGuard'

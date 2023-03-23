@@ -167,4 +167,4 @@ export const NewIdea = () => {
   )
 }
 
-export default { NewIdea, RequiredIdeaInput, IdeaInput }
+export default NewIdea

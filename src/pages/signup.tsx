@@ -16,6 +16,7 @@ import {
 } from '@chakra-ui/react'
 import { doc, getFirestore, setDoc } from '@firebase/firestore'
 import { FirebaseError } from '@firebase/util'
+import { createWeb3Account } from '@src/lib/createWeb3Account'
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -42,10 +43,13 @@ export const SignUp = () => {
         email,
         password
       )
+      const account = createWeb3Account()
 
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         email: userCredential.user.email,
         role: role,
+        address: account.address,
+        privateKey: account.privateKey,
       })
 
       await sendEmailVerification(userCredential.user)
@@ -102,9 +106,10 @@ export const SignUp = () => {
                 }}
               />
             </FormControl>
-            <FormControl>
+            <FormControl isRequired aria-required>
               <FormLabel>ロール</FormLabel>
               <Select value={role} onChange={(e) => setRole(e.target.value)}>
+                <option value=""></option>
                 <option value="engineer">技術職</option>
                 <option value="business">事務職</option>
                 <option value="administrator">BE creation</option>

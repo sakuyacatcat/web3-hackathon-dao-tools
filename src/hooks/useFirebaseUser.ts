@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 
 export interface UserWithRole extends User {
   role?: string
+  address?: string
 }
 
 export default function useFirebaseUser() {
@@ -18,7 +19,11 @@ export default function useFirebaseUser() {
         const docRef = doc(db, 'users', loginUser.uid)
         const docSnap = await getDoc(docRef)
         if (docSnap.exists()) {
-          setUser({ ...loginUser, role: docSnap.data()?.role })
+          setUser({
+            ...loginUser,
+            role: docSnap.data()?.role,
+            address: docSnap.data()?.address,
+          })
         }
       } else {
         setUser(null)

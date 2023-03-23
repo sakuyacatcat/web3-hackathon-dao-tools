@@ -3,8 +3,9 @@ import { AuthGuardAdmin } from '@src/components/AuthGuardAdmin'
 import initializeFirebaseClient from '@src/configs/initFirebase'
 import useFirebaseIdea from '@src/hooks/useFirebaseIdea'
 import useFirebaseUser from '@src/hooks/useFirebaseUser'
+import investByVote from '@src/lib/contracts/invextByVote'
 import { remainingDate } from '@src/lib/date'
-import { arrayUnion, doc, updateDoc } from 'firebase/firestore'
+import { arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
@@ -46,6 +47,13 @@ const VotePage = () => {
 
   const handleVote = async (yesOrNo: string) => {
     const vote = yesOrNo === 'Yes' ? true : false
+
+    if (vote === true) {
+      const authorRef = doc(db, "users", idea?.userUid)
+      const author = await getDoc(authorRef)
+      investByVote(author.data().address, 1)
+    }
+
     try {
       await updateDoc(doc(db, 'ideas', id), {
         votes: arrayUnion({
